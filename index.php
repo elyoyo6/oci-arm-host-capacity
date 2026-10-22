@@ -25,16 +25,16 @@ $dotenv->safeLoad();
  * README.md now has all the information.
  */
 $config = new OciConfig(
-    getenv('OCI_REGION'),
-    getenv('OCI_USER_ID'),
-    getenv('OCI_TENANCY_ID'),
-    getenv('OCI_KEY_FINGERPRINT'),
-    getenv('OCI_PRIVATE_KEY_FILENAME'),
-    getenv('OCI_AVAILABILITY_DOMAIN') ?: null, // null or '' or 'jYtI:PHX-AD-1' or ['jYtI:PHX-AD-1','jYtI:PHX-AD-2']
-    getenv('OCI_SUBNET_ID'),
-    getenv('OCI_IMAGE_ID'),
-    (int) getenv('OCI_OCPUS'),
-    (int) getenv('OCI_MEMORY_IN_GBS')
+    'eu-madrid-1',
+    'ocid1.user.oc1..aaaaaaaanyfjempgs2s646cg4xvndmgfoavnpmhkpf6qytssto2zmph7q6wa',
+    'ocid1.tenancy.oc1..aaaaaaaamldz52gjna33cjfgs4iv5dqzixfsjpas75jxoyrmofg3rcaa6b4q',
+    '4d:5a:93:24:9e:b1:95:e7:18:d5:07:28:ab:87:c6:93',
+    getenv('OCI_PRIVATE_KEY_PATH') ?: "asantosrodriguez60@gmail.com-2026-10-22T15_20_17.528Z.pem",
+    'jXdV:EU-MADRID-1-AD-1', // null or '' or 'jYtI:PHX-AD-1' or ['jYtI:PHX-AD-1','jYtI:PHX-AD-2']
+    'ocid1.subnet.oc1.eu-madrid-1.aaaaaaaaputbkyzc4momq47ceymr6hyhuzcw3z4lovwaao2rk4d7crwvyhya',
+    'ocid1.image.oc1.eu-madrid-1.aaaaaaaal74fd4sfioiwskdrymmlh5b25hiofdr4sg22jix2hr7tmh6rcaxq',
+    1,
+    1
 );
 
 $bootVolumeSizeInGBs = (string) getenv('OCI_BOOT_VOLUME_SIZE_IN_GBS');
@@ -64,12 +64,17 @@ $notifier = (function (): \Hitrov\Interfaces\NotifierInterface {
     return new \Hitrov\Notification\Telegram();
 })();
 
-$shape = getenv('OCI_SHAPE');
+$shape = 'VM.Standard.E2.1.Micro';
 
 $maxRunningInstancesOfThatShape = 1;
 if (getenv('OCI_MAX_INSTANCES') !== false) {
     $maxRunningInstancesOfThatShape = (int) getenv('OCI_MAX_INSTANCES');
 }
+
+#$result = $api->getAvailabilityDomains($config);
+#$result = $api->getImages($config);
+#echo json_encode($result, JSON_PRETTY_PRINT);
+#exit;
 
 $instances = $api->getInstances($config);
 
@@ -92,7 +97,7 @@ if (!empty($config->availabilityDomains)) {
 foreach ($availabilityDomains as $availabilityDomainEntity) {
     $availabilityDomain = is_array($availabilityDomainEntity) ? $availabilityDomainEntity['name'] : $availabilityDomainEntity;
     try {
-        $instanceDetails = $api->createInstance($config, $shape, getenv('OCI_SSH_PUBLIC_KEY'), $availabilityDomain);
+        $instanceDetails = $api->createInstance($config, $shape, 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxwFwOW+stftsezW0sAKQ1pc9nT/7e6ScwGQAufgIdgLAQKmCsv1yjBLBHBFCaALUMPqybsigqmi845egCWjVcidfs5P5xzhNhJDdJS+lRZcHNNsgMtKjb85Y0ebF25wh9O6lJvCafQci/rnGs9T2pVePRUQgPTkuMom+yDRkWBN39D4DvkhSK6f4zZKVmYqfF2UDNETNl+4nQP7MytsJcrJxzjlN6Qh2rBUdnFVfUMpQBPn9GQL5Is0tmAtnEbI/b+lIKRe6zl/hgXwe2ntGSchks3Rtmi/j9agAo3Fzt6OnGa8ZYiOJiDveVzZdn0EL1g48UiRPbAvPozR2BqxE9 ssh-key-2026-10-22', $availabilityDomain);
     } catch(ApiCallException $e) {
         $message = $e->getMessage();
         echo "$message\n";

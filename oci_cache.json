@@ -1,0 +1,11 @@
+{
+    "getAvailabilityDomains": {
+        "eb42e169cdca3d562d83bf01fdc32b4a": [
+            {
+                "compartmentId": "ocid1.tenancy.oc1..aaaaaaaamldz52gjna33cjfgs4iv5dqzixfsjpas75jxoyrmofg3rcaa6b4q",
+                "id": "ocid1.availabilitydomain.oc1..aaaaaaaapwdvvyn7wtnuphlw2ogec6b2s73scavimbvcbfm5eg2xhwnelj2q",
+                "name": "jXdV:EU-MADRID-1-AD-1"
+            }
+        ]
+    }
+}

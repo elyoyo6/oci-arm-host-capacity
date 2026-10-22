@@ -66,6 +66,7 @@ class OciApi
     "availabilityDomain": "$availabilityDomain",
     "sourceDetails": {$config->getSourceDetails()},
     "createVnicDetails": {
+        "displayName": "Sitio Web 3",
         "assignPublicIp": false,
         "subnetId": "{$config->subnetId}",
         "assignPrivateDnsRecord": true
@@ -95,7 +96,7 @@ class OciApi
 }
 EOD;
 
-        $baseUrl = "{$this->getBaseApiUrl($config)}/instances/";
+        $baseUrl = "{$this->getBaseApiUrl($config)}/instances";
 
         try {
             return $this->call($config, $baseUrl, 'POST', $body);
@@ -126,7 +127,7 @@ EOD;
      */
     public function getInstances(OciConfig $config): array
     {
-        $baseUrl = "{$this->getBaseApiUrl($config)}/instances/";
+        $baseUrl = "{$this->getBaseApiUrl($config)}/instances";
         $params = ['compartmentId' => $config->tenancyId];
 
         return $this->call($config, $baseUrl, 'GET', null, $params);
@@ -229,6 +230,7 @@ EOD;
         }
 
         $url = "$baseUrl$paramsString";
+        var_dump($url);
 
         $signer = new Signer(
             $config->tenancyId,
@@ -238,13 +240,15 @@ EOD;
         );
 
         $headers = $signer->getHeaders($url, $method, $body, 'application/json');
+        var_dump($url);
+        var_dump($headers);
 
         $curlOptions = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_MAXREDIRS => 1,
             CURLOPT_TIMEOUT => 10,
-            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_HTTPHEADER => $headers,
