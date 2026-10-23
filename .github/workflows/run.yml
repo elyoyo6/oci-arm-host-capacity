@@ -2,6 +2,8 @@ name: Run OCI ARM Host Capacity
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "2/5 * * * *"
 
 permissions:
   contents: read
