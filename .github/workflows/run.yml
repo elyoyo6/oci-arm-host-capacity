@@ -1,0 +1,38 @@
+name: Run OCI ARM Host Capacity
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: curl
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Prepare private key
+        env:
+          OCI_PRIVATE_KEY_PEM: ${{ secrets.OCI_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          test -n "$OCI_PRIVATE_KEY_PEM"
+          printf '%s\n' "$OCI_PRIVATE_KEY_PEM" > "$RUNNER_TEMP/oci-private-key.pem"
+          chmod 600 "$RUNNER_TEMP/oci-private-key.pem"
+          echo "OCI_PRIVATE_KEY_PATH=$RUNNER_TEMP/oci-private-key.pem" >> "$GITHUB_ENV"
+
+      - name: Run script
+        run: php index.php
